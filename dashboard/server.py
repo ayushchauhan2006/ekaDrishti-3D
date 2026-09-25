@@ -5,6 +5,8 @@ from __future__ import annotations
 import cgi
 import json
 import mimetypes
+import os
+import signal
 import shutil
 import subprocess
 import sys
@@ -93,6 +95,24 @@ class JobState:
 
 
 JOB = JobState()
+RUNNER_LOCK = threading.Lock()
+ACTIVE_PROCESS: subprocess.Popen[str] | None = None
+
+
+def _cancel_active_reconstruction() -> bool:
+    """Stop the pipeline and every child process it started."""
+    with RUNNER_LOCK:
+        process = ACTIVE_PROCESS
+        if process is None or process.poll() is not None:
+            return False
+        JOB.update(
+            status="cancelling",
+            stage="Stopping local reconstruction",
+            message="Cancellation requested",
+            cancel_requested=True,
+        )
+        os.killpg(process.pid, signal.SIGTERM)
+        return True
 
 
 def _safe_filename(filename: str, suffix: str) -> str:
@@ -108,6 +128,7 @@ def _usable_telemetry(telemetry: Path) -> bool:
 
 
 def _run_reconstruction(job_id: str, video: Path, telemetry: Path, workspace: Path, profile: str) -> None:
+    global ACTIVE_PROCESS
     profile_assets = ASSETS_ROOT / "models" / profile
     command = [
         str(PROJECT_ROOT / ".venv/bin/python") if (PROJECT_ROOT / ".venv/bin/python").is_file() else sys.executable, "-u", "-m", "src.ekadrishti.full_pipeline",
@@ -115,10 +136,13 @@ def _run_reconstruction(job_id: str, video: Path, telemetry: Path, workspace: Pa
         "--project-root", str(PROJECT_ROOT), "--profile", profile, "--publish-directory", str(profile_assets), "--use-gpu",
     ]
     log: list[str] = []
+    process: subprocess.Popen[str] | None = None
     try:
         process = subprocess.Popen(
-            command, cwd=PROJECT_ROOT, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+            command, cwd=PROJECT_ROOT, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, start_new_session=True
         )
+        with RUNNER_LOCK:
+            ACTIVE_PROCESS = process
         assert process.stdout is not None
         for raw_line in process.stdout:
             line = raw_line.strip()
@@ -130,14 +154,25 @@ def _run_reconstruction(job_id: str, video: Path, telemetry: Path, workspace: Pa
                 JOB.update(status="running", stage=line.removeprefix("STEP:").strip(), log=log)
             else:
                 JOB.update(log=log)
-        if process.wait() != 0:
+        exit_code = process.wait()
+        if JOB.snapshot().get("cancel_requested"):
+            JOB.update(status="cancelled", stage="Reconstruction stopped", message="No partial model was published.", log=log)
+            return
+        if exit_code != 0:
             raise RuntimeError(log[-1] if log else "The reconstruction process stopped unexpectedly.")
         report_path = workspace / "outputs" / "reconstruction_report.json"
         report = json.loads(report_path.read_text(encoding="utf-8")) if report_path.is_file() else {}
         catalog = _record_completed_model(profile, report)
         JOB.update(status="complete", stage=f"{catalog['models'][profile]['label']} ready to inspect", result=report, profile=profile, models=catalog, log=log)
     except Exception as error:  # Keep the server alive so the dashboard can show the failure.
-        JOB.update(status="failed", stage="Processing stopped", message=str(error), log=log)
+        if JOB.snapshot().get("cancel_requested"):
+            JOB.update(status="cancelled", stage="Reconstruction stopped", message="No partial model was published.", log=log)
+        else:
+            JOB.update(status="failed", stage="Processing stopped", message=str(error), log=log)
+    finally:
+        with RUNNER_LOCK:
+            if ACTIVE_PROCESS is process:
+                ACTIVE_PROCESS = None
 
 
 class DashboardHandler(BaseHTTPRequestHandler):
@@ -182,10 +217,17 @@ class DashboardHandler(BaseHTTPRequestHandler):
         self.wfile.write(data)
 
     def do_POST(self) -> None:
-        if urlparse(self.path).path != "/api/process":
+        request_path = urlparse(self.path).path
+        if request_path == "/api/cancel":
+            if _cancel_active_reconstruction():
+                self._json(JOB.snapshot(), HTTPStatus.ACCEPTED)
+            else:
+                self._error("No local reconstruction is running.", HTTPStatus.CONFLICT)
+            return
+        if request_path != "/api/process":
             self._error("Unknown endpoint", HTTPStatus.NOT_FOUND)
             return
-        if JOB.snapshot().get("status") == "running":
+        if JOB.snapshot().get("status") in {"running", "cancelling"}:
             self._error("Another mission is already being processed. Please wait for it to finish.", HTTPStatus.CONFLICT)
             return
         length = int(self.headers.get("Content-Length", "0"))
@@ -227,7 +269,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self._error("The selected SRT could not be read as DJI flight telemetry. Upload the original matching DJI SRT file.")
             return
         workspace = MISSIONS_ROOT / job_id / "work"
-        JOB.update(status="running", job_id=job_id, stage="Mission received", message="Starting local reconstruction", result={}, log=[])
+        JOB.update(
+            status="running", job_id=job_id, stage="Mission received",
+            message="Starting local reconstruction", result={}, log=[], profile=profile,
+            started_at=time.time(), cancel_requested=False,
+        )
         thread = threading.Thread(target=_run_reconstruction, args=(job_id, video_path, telemetry_path, workspace, profile), daemon=True)
         thread.start()
         self._json(JOB.snapshot(), HTTPStatus.ACCEPTED)

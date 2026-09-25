@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#071b2c" />
     <title>EkaDrishti 3D | Mission Console</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-    <link rel="stylesheet" href="styles.css?v=model-library-2" /><link rel="stylesheet" href="compliance.css?v=model-library" />
+    <link rel="stylesheet" href="styles.css?v=processing-control-2" /><link rel="stylesheet" href="compliance.css?v=model-library" />
   </head>
   <body>
     <main class="shell focused-shell">
@@ -29,9 +29,10 @@
           <a class="viewer-feature" id="hero-viewer-link" href="textured_viewer.html?mode=precision">
             <span class="viewer-orbit">3D</span><span><strong>Explore interactive 3D model</strong><small>Orbit 360°, zoom close, and inspect every visible surface</small></span><b>→</b>
           </a>
-          <div class="mission-tools"><div class="new-run-settings"><label class="profile-control"><span>New run quality</span><select id="processing-profile"><option value="rapid">Rapid preview</option><option value="precision" selected>Precision model</option></select></label><small>Used only when you process a newly uploaded mission.</small></div>
-            <label class="button secondary" for="mission-files">New DJI MP4 + SRT<input id="mission-files" type="file" accept="video/mp4,video/quicktime,.mp4,.mov,.srt" multiple hidden /></label>
-            <button class="button primary" id="process-button" type="button">Start reconstruction</button>
+          <div class="mission-tools"><div class="new-run-settings"><label class="profile-control"><span>New run quality</span><select id="processing-profile"><option value="rapid">Rapid preview</option><option value="precision" selected>Precision model</option></select></label><small>Upload an original DJI video and matching SRT. The selected mode creates its own saved model.</small></div>
+            <div class="upload-inputs"><label class="button secondary" for="mission-video">1. Choose video<input id="mission-video" type="file" accept="video/mp4,video/quicktime,.mp4,.mov" hidden /></label><label class="button secondary" for="mission-telemetry">2. Choose DJI SRT<input id="mission-telemetry" type="file" accept=".srt,text/plain" hidden /></label></div>
+            <p class="upload-feedback" id="upload-feedback" aria-live="polite"><span id="video-upload-state">Video: waiting</span><span id="telemetry-upload-state">SRT: waiting</span></p>
+            <button class="button primary" id="process-button" type="button">Build Precision model</button>
           </div><section class="model-library" id="model-library" aria-label="Available 3D model results"><div class="model-library-copy"><p class="eyebrow">AVAILABLE 3D RESULTS</p><strong id="active-model-label">Precision model is ready</strong><small>Choose a completed reconstruction to inspect it in the 3D viewer.</small></div><div class="model-switches" id="model-switches"></div></section>
         </div>
       </section>
@@ -77,6 +78,6 @@
         <p>For any stated absolute-accuracy threshold, complete one of the supplied checkpoint or reference-dimension CSV templates and run the independent evaluator.</p>
       </dialog>
     </main>
-    <script src="app.js"></script><script src="process.js"></script>
+    <script src="app.js"></script><script src="process.js?v=processing-control-2"></script>
   </body>
 </html>
