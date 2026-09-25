@@ -6,86 +6,75 @@
     <meta name="theme-color" content="#071b2c" />
     <title>EkaDrishti 3D | Mission Console</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=focus-dashboard" />
   </head>
   <body>
-    <main class="shell">
+    <main class="shell focused-shell">
       <header class="topbar">
         <div class="brand" aria-label="EkaDrishti 3D">
           <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
-          <div><strong>EkaDrishti</strong><span>3D Mission Console</span></div>
+          <div><strong>EkaDrishti</strong><span>RTK 3D Mission Studio</span></div>
         </div>
-        <div class="top-status"><span class="dot"></span> Local workspace</div>
+        <div class="top-status"><span class="dot"></span> Model ready</div>
       </header>
 
-      <section class="workspace-head" aria-labelledby="mission-heading">
-        <div>
-          <p class="eyebrow">CURRENT MISSION</p>
-          <h1 id="mission-heading">City buildings visual model</h1>
-          <p class="mission-subtitle">13201510-uhd_3840_2160_24fps · reconstructed from MP4 only</p>
+      <section class="mission-hero" aria-labelledby="mission-heading">
+        <div class="hero-copy">
+          <p class="eyebrow">DJI_0289 · COMPLETED MISSION</p>
+          <h1 id="mission-heading">Explore the city in 3D.</h1>
+          <p>Photo-textured reconstruction, aligned with matching RTK telemetry. Inspect the real roofs, trees, roads, and building geometry captured by the drone.</p>
+          <div class="hero-proof"><span><b>164</b> matched views</span><span><b>2.51M</b> terrain triangles</span><span><b>6.5 cm</b> GPS agreement</span></div>
         </div>
-        <div class="head-actions">
-          <label class="button secondary" for="mission-files">Add DJI MP4 + SRT<input id="mission-files" type="file" accept="video/mp4,video/quicktime,.mp4,.mov,.srt" multiple hidden /></label>
-          <button class="button primary" id="process-button" type="button">Process mission</button>
+        <div class="hero-actions">
+          <a class="viewer-feature" href="textured_viewer.html?ui=polish">
+            <span class="viewer-orbit">3D</span><span><strong>Explore interactive 3D model</strong><small>Orbit 360°, zoom close, and inspect every visible surface</small></span><b>→</b>
+          </a>
+          <div class="mission-tools">
+            <label class="button secondary" for="mission-files">New DJI MP4 + SRT<input id="mission-files" type="file" accept="video/mp4,video/quicktime,.mp4,.mov,.srt" multiple hidden /></label>
+            <button class="button primary" id="process-button" type="button">Start reconstruction</button>
+          </div>
         </div>
       </section>
 
       <section class="upload-notice" id="upload-notice" hidden aria-live="polite"></section>
 
-      <section class="metric-grid" aria-label="Mission summary">
-        <article class="metric"><span>Video duration</span><strong>00:21</strong><small>MP4 visual reconstruction</small></article>
-        <article class="metric"><span>Telemetry records</span><strong>None</strong><small>GPS measurements disabled</small></article>
-        <article class="metric"><span>Frames accepted</span><strong>85</strong><small>Sharp city frames retained</small></article>
-        <article class="metric"><span>Sparse 3D points</span><strong>35,898</strong><small>All 85 images registered</small></article>
+      <section class="metric-grid mission-metrics" aria-label="Mission results">
+        <article class="metric"><span>3D surface</span><strong>2.51M</strong><small>photo-textured triangles</small></article>
+        <article class="metric"><span>Visual coverage</span><strong>164</strong><small>registered DJI frames</small></article>
+        <article class="metric"><span>GPS consistency</span><strong>6.5 cm</strong><small>internal horizontal agreement</small></article>
+        <article class="metric"><span>Mapped area</span><strong>127 × 100 m</strong><small>observed terrain footprint</small></article>
       </section>
 
-      <section class="main-grid">
-        <article class="panel map-panel">
-          <div class="panel-heading"><div><p class="eyebrow">VISUAL COVERAGE</p><h2>Camera path estimate</h2></div><span class="pill">No SRT supplied</span></div>
-          <div class="map-canvas" aria-label="Map of the recorded flight path">
-            <div class="terrain terrain-one"></div><div class="terrain terrain-two"></div><div class="terrain terrain-three"></div>
-            <svg id="flight-path" viewBox="0 0 1000 560" preserveAspectRatio="none" role="img" aria-label="Flight route from southwest to northeast"></svg>
-            <div class="map-legend"><span><b class="legend-start"></b> Start</span><span><b class="legend-end"></b> End</span></div>
-            <div class="map-caption">No GPS coordinates supplied <em>·</em> visual model only</div>
-          </div>
+      <section class="outcome-grid">
+        <article class="panel explore-panel">
+          <div class="panel-heading"><div><p class="eyebrow">MAIN FEATURE</p><h2>Your interactive 3D world</h2></div><span class="pill success">Ready now</span></div>
+          <p class="panel-copy">The primary experience is the textured 3D viewer—not a static report. Rotate above or below the model, zoom into a roof, and pan across the compound.</p>
+          <a class="open-model-button" href="textured_viewer.html?ui=polish">Open the 3D viewer <span>→</span></a>
+          <div class="feature-list"><span>360° free orbit</span><span>Photo-real texture</span><span>RTK-aligned</span></div>
         </article>
-
-        <article class="panel process-panel">
-          <div class="panel-heading"><div><p class="eyebrow">PIPELINE</p><h2>Processing status</h2></div><span class="pill success">Photo-textured model ready</span></div>
-          <ol class="pipeline" id="pipeline">
-            <li class="done"><span class="step-icon">✓</span><div><strong>Inspect mission</strong><small>Original DJI MP4 + matching SRT required</small></div><time>Done</time></li>
-            <li class="done"><span class="step-icon">✓</span><div><strong>Select sharp frames</strong><small>85 usable city images retained</small></div><time>Done</time></li>
-            <li class="done"><span class="step-icon">✓</span><div><strong>Build sparse 3D model</strong><small>1.05 px mean reprojection error</small></div><time>Done</time></li>
-            <li><span class="step-icon">4</span><div><strong>GPS calibration</strong><small>Unavailable: no readable telemetry or ground control</small></div><time>Skipped</time></li>
-            <li class="done"><span class="step-icon">✓</span><div><strong>Generate dense surface, mesh, and texture</strong><small>1.07 million points · 470,652 textured triangles</small></div><time>Done</time></li>
-            <li><span class="step-icon">6</span><div><strong>AI cleanup and quality report</strong><small>Detect moving objects and weak areas</small></div><time>Pending</time></li>
-          </ol>
+        <article class="panel trust-panel">
+          <div class="panel-heading"><div><p class="eyebrow">MISSION CONFIDENCE</p><h2>What the result means</h2></div></div>
+          <div class="trust-row"><b>✓</b><div><strong>Real scene geometry</strong><small>Built from overlapping drone frames, not generated imagery.</small></div></div>
+          <div class="trust-row"><b>✓</b><div><strong>Located by RTK telemetry</strong><small>Camera path is aligned to the original DJI flight data.</small></div></div>
+          <div class="trust-row"><b>!</b><div><strong>Use checkpoints for surveying</strong><small>Ground control is still needed before making an absolute accuracy claim.</small></div></div>
         </article>
       </section>
 
-      <section class="bottom-grid">
-        <article class="panel model-panel">
-          <div class="panel-heading"><div><p class="eyebrow">RECONSTRUCTION</p><h2>Current 3D result</h2></div><span class="pill success">Photo-textured mesh</span></div>
-          <div class="model-preview" aria-label="Stylized sparse point cloud preview">
-            <canvas id="point-cloud" width="780" height="290"></canvas>
-            <div class="model-annotation"><strong>1.07 million dense points</strong><span>470,652 triangles · real city-video texture</span></div>
-          </div>
-          <div class="model-footer"><span><b class="quality-dot"></b> Geometry is internally consistent</span><span class="model-links"><a href="textured_viewer.html">Open textured 3D viewer →</a><a id="model-download" href="assets/dense_textured_mesh.ply" download>Download PLY ↗</a></span></div>
-        </article>
-
-        <article class="panel accuracy-panel">
-          <div class="panel-heading"><div><p class="eyebrow">READINESS</p><h2>What is still needed</h2></div></div>
-          <div class="accuracy-score"><span>Visual-model readiness</span><strong>75%</strong><div class="bar"><i></i></div></div>
-          <p class="warning"><b>Important:</b> this is a visual-only 3D model because no readable GPS telemetry was supplied. Do not use it for real-world distances, coordinates, or survey measurements.</p>
-          <button class="text-button" id="details-button" type="button">Why this matters <span>→</span></button>
-        </article>
-      </section>
+      <details class="processing-details" id="processing-details">
+        <summary>Mission processing record <span>View technical steps</span></summary>
+        <ol class="pipeline" id="pipeline">
+          <li class="done"><span class="step-icon">✓</span><div><strong>Mission input validated</strong><small>Original DJI video and matching RTK SRT accepted</small></div><time>Done</time></li>
+          <li class="done"><span class="step-icon">✓</span><div><strong>Visual reconstruction</strong><small>164 camera views registered into one scene</small></div><time>Done</time></li>
+          <li class="done"><span class="step-icon">✓</span><div><strong>RTK alignment</strong><small>6.5 cm internal horizontal GPS agreement</small></div><time>Verified</time></li>
+          <li class="done"><span class="step-icon">✓</span><div><strong>Dense model and texture</strong><small>2.51 million photo-textured triangles produced</small></div><time>Done</time></li>
+        </ol>
+      </details>
 
       <dialog id="details-dialog">
         <button class="dialog-close" id="close-dialog" aria-label="Close">×</button>
-        <p class="eyebrow">METRIC ACCURACY</p><h2>Why calibration comes next</h2>
-        <p>The point cloud is geometrically consistent because the same city features match across many video frames. This mission did not include readable GPS telemetry, so its shape is visual-only and has no geographic location.</p>
-        <p>To measure a road, roof, or building later, provide usable telemetry and validate the result with known positions or ground-control points.</p>
+        <p class="eyebrow">ACCURACY NOTE</p><h2>How to present this result</h2>
+        <p>EkaDrishti reconstructs the visible scene from overlapping drone frames, then aligns the camera path using the matching DJI RTK telemetry.</p>
+        <p>For survey-grade claims, validate the mission with independent ground-control checkpoints.</p>
       </dialog>
     </main>
     <script src="app.js"></script><script src="process.js"></script>

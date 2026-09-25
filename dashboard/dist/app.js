@@ -5,12 +5,14 @@ const route = [
 
 function drawRoute() {
   const svg = document.querySelector('#flight-path');
+  if (!svg) return;
   const path = route.map((point,index)=>`${index?'L':'M'} ${point[0]} ${point[1]}`).join(' ');
   svg.innerHTML = `<path d="${path}" fill="none" stroke="#0d9a91" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" opacity=".18"/><path d="${path}" fill="none" stroke="#087e77" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${route[0][0]}" cy="${route[0][1]}" r="8" fill="#0d9a91" stroke="white" stroke-width="3"/><circle cx="${route.at(-1)[0]}" cy="${route.at(-1)[1]}" r="8" fill="#e8584e" stroke="white" stroke-width="3"/>`;
 }
 
 function drawPointCloud() {
   const canvas = document.querySelector('#point-cloud');
+  if (!canvas) return;
   const context = canvas.getContext('2d');
   const {width,height}=canvas;
   context.fillStyle='#09283b'; context.fillRect(0,0,width,height);
@@ -72,7 +74,9 @@ function updateReadyDashboard(report) {
 
 function setupDialog() {
   const dialog=document.querySelector('#details-dialog');
-  document.querySelector('#details-button').addEventListener('click',()=>dialog.showModal());
+  const trigger=document.querySelector('#details-button');
+  if (!dialog || !trigger) return;
+  trigger.addEventListener('click',()=>dialog.showModal());
   document.querySelector('#close-dialog').addEventListener('click',()=>dialog.close());
 }
 

@@ -7,13 +7,14 @@
   originalButton.replaceWith(button);
   const notice = document.querySelector('#upload-notice');
   const pipeline = document.querySelector('#pipeline');
+  const processingDetails = document.querySelector('#processing-details');
   const statusBox = document.createElement('div');
   statusBox.className = 'job-status'; statusBox.hidden = true; statusBox.setAttribute('aria-live', 'polite');
   statusBox.innerHTML = '<span class="spinner"></span><div><strong></strong><small></small></div>';
   pipeline.insertAdjacentElement('afterend', statusBox);
   const stage = statusBox.querySelector('strong'); const log = statusBox.querySelector('small'); let pollTimer;
   function showStatus(data) {
-    const active = data.status === 'running'; statusBox.hidden = !data.stage; stage.textContent = data.stage || '';
+    const active = data.status === 'running'; if (active && processingDetails) processingDetails.open = true; statusBox.hidden = !data.stage; stage.textContent = data.stage || '';
     log.textContent = Array.isArray(data.log) && data.log.length ? data.log.at(-1) : (data.message || '');
     button.disabled = active; button.textContent = active ? 'Processing locally…' : 'Process mission';
     if (data.status === 'complete') { notice.hidden = false; notice.textContent = '3D reconstruction ready. Review calibration status before taking real-world measurements.'; }
