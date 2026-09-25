@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#071b2c" />
+    <title>EkaDrishti 3D | Mission Console</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div class="brand" aria-label="EkaDrishti 3D">
+          <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+          <div><strong>EkaDrishti</strong><span>3D Mission Console</span></div>
+        </div>
+        <div class="top-status"><span class="dot"></span> Local workspace</div>
+      </header>
+
+      <section class="workspace-head" aria-labelledby="mission-heading">
+        <div>
+          <p class="eyebrow">CURRENT MISSION</p>
+          <h1 id="mission-heading">City buildings visual model</h1>
+          <p class="mission-subtitle">13201510-uhd_3840_2160_24fps · reconstructed from MP4 only</p>
+        </div>
+        <div class="head-actions">
+          <label class="button secondary" for="mission-files">Add DJI MP4 + SRT<input id="mission-files" type="file" accept="video/mp4,video/quicktime,.mp4,.mov,.srt" multiple hidden /></label>
+          <button class="button primary" id="process-button" type="button">Process mission</button>
+        </div>
+      </section>
+
+      <section class="upload-notice" id="upload-notice" hidden aria-live="polite"></section>
+
+      <section class="metric-grid" aria-label="Mission summary">
+        <article class="metric"><span>Video duration</span><strong>00:21</strong><small>MP4 visual reconstruction</small></article>
+        <article class="metric"><span>Telemetry records</span><strong>None</strong><small>GPS measurements disabled</small></article>
+        <article class="metric"><span>Frames accepted</span><strong>85</strong><small>Sharp city frames retained</small></article>
+        <article class="metric"><span>Sparse 3D points</span><strong>35,898</strong><small>All 85 images registered</small></article>
+      </section>
+
+      <section class="main-grid">
+        <article class="panel map-panel">
+          <div class="panel-heading"><div><p class="eyebrow">VISUAL COVERAGE</p><h2>Camera path estimate</h2></div><span class="pill">No SRT supplied</span></div>
+          <div class="map-canvas" aria-label="Map of the recorded flight path">
+            <div class="terrain terrain-one"></div><div class="terrain terrain-two"></div><div class="terrain terrain-three"></div>
+            <svg id="flight-path" viewBox="0 0 1000 560" preserveAspectRatio="none" role="img" aria-label="Flight route from southwest to northeast"></svg>
+            <div class="map-legend"><span><b class="legend-start"></b> Start</span><span><b class="legend-end"></b> End</span></div>
+            <div class="map-caption">No GPS coordinates supplied <em>·</em> visual model only</div>
+          </div>
+        </article>
+
+        <article class="panel process-panel">
+          <div class="panel-heading"><div><p class="eyebrow">PIPELINE</p><h2>Processing status</h2></div><span class="pill success">Photo-textured model ready</span></div>
+          <ol class="pipeline" id="pipeline">
+            <li class="done"><span class="step-icon">✓</span><div><strong>Inspect mission</strong><small>Original DJI MP4 + matching SRT required</small></div><time>Done</time></li>
+            <li class="done"><span class="step-icon">✓</span><div><strong>Select sharp frames</strong><small>85 usable city images retained</small></div><time>Done</time></li>
+            <li class="done"><span class="step-icon">✓</span><div><strong>Build sparse 3D model</strong><small>1.05 px mean reprojection error</small></div><time>Done</time></li>
+            <li><span class="step-icon">4</span><div><strong>GPS calibration</strong><small>Unavailable: no readable telemetry or ground control</small></div><time>Skipped</time></li>
+            <li class="done"><span class="step-icon">✓</span><div><strong>Generate dense surface, mesh, and texture</strong><small>1.07 million points · 470,652 textured triangles</small></div><time>Done</time></li>
+            <li><span class="step-icon">6</span><div><strong>AI cleanup and quality report</strong><small>Detect moving objects and weak areas</small></div><time>Pending</time></li>
+          </ol>
+        </article>
+      </section>
+
+      <section class="bottom-grid">
+        <article class="panel model-panel">
+          <div class="panel-heading"><div><p class="eyebrow">RECONSTRUCTION</p><h2>Current 3D result</h2></div><span class="pill success">Photo-textured mesh</span></div>
+          <div class="model-preview" aria-label="Stylized sparse point cloud preview">
+            <canvas id="point-cloud" width="780" height="290"></canvas>
+            <div class="model-annotation"><strong>1.07 million dense points</strong><span>470,652 triangles · real city-video texture</span></div>
+          </div>
+          <div class="model-footer"><span><b class="quality-dot"></b> Geometry is internally consistent</span><span class="model-links"><a href="textured_viewer.html">Open textured 3D viewer →</a><a id="model-download" href="assets/dense_textured_mesh.ply" download>Download PLY ↗</a></span></div>
+        </article>
+
+        <article class="panel accuracy-panel">
+          <div class="panel-heading"><div><p class="eyebrow">READINESS</p><h2>What is still needed</h2></div></div>
+          <div class="accuracy-score"><span>Visual-model readiness</span><strong>75%</strong><div class="bar"><i></i></div></div>
+          <p class="warning"><b>Important:</b> this is a visual-only 3D model because no readable GPS telemetry was supplied. Do not use it for real-world distances, coordinates, or survey measurements.</p>
+          <button class="text-button" id="details-button" type="button">Why this matters <span>→</span></button>
+        </article>
+      </section>
+
+      <dialog id="details-dialog">
+        <button class="dialog-close" id="close-dialog" aria-label="Close">×</button>
+        <p class="eyebrow">METRIC ACCURACY</p><h2>Why calibration comes next</h2>
+        <p>The point cloud is geometrically consistent because the same city features match across many video frames. This mission did not include readable GPS telemetry, so its shape is visual-only and has no geographic location.</p>
+        <p>To measure a road, roof, or building later, provide usable telemetry and validate the result with known positions or ground-control points.</p>
+      </dialog>
+    </main>
+    <script src="app.js"></script><script src="process.js"></script>
+  </body>
+</html>

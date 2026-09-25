@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#061925" />
+    <title>EkaDrishti 3D | Metric Presentation</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="stylesheet" href="presentation.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="back" href="index.html">← Mission console</a>
+      <div class="brand"><span class="mark"><i></i><i></i><i></i></span><strong>EkaDrishti</strong><small>METRIC 3D</small></div>
+      <span class="ready"><i></i> Presentation model ready</span>
+    </header>
+    <main class="layout">
+      <section class="viewport" aria-label="Interactive metric 3D reconstruction">
+        <canvas id="model-canvas" aria-label="Interactive 3D model. Drag to rotate and scroll to zoom."></canvas>
+        <div class="loading" id="loading"><span></span><strong>Loading metric surface</strong><small>Preparing 220,000 colored triangles…</small></div>
+        <div class="scene-error" id="scene-error" hidden></div>
+        <div class="scene-title"><span>DJI VIDEO RECONSTRUCTION</span><strong>Kamloops terrain survey</strong></div>
+        <div class="view-switch" role="group" aria-label="Geometry layer">
+          <button class="active" type="button" data-mode="mesh">Surface</button>
+          <button type="button" data-mode="points">Points</button>
+          <button type="button" data-mode="confidence">Confidence</button>
+        </div>
+        <div class="help"><b>Drag</b> orbit <em>·</em> <b>Scroll</b> zoom <em>·</em> <b>Double-click</b> reset</div>
+        <div class="scale"><i></i><span>Metric scale · EPSG:32611</span></div>
+      </section>
+      <aside class="inspector">
+        <div class="inspector-head"><p>DELIVERABLE OVERVIEW</p><h1>Geo-referenced 3D surface</h1><span class="badge">READY</span></div>
+        <p class="intro">A presentation-grade colored surface reconstructed from the supplied DJI video, synchronized to its flight telemetry and scaled in metres.</p>
+        <section class="hero-stat"><span>Survey footprint</span><strong id="footprint">1.25 × 1.94 km</strong><small>Observed photogrammetric extent</small></section>
+        <div class="stat-grid">
+          <div><span>Mesh</span><strong id="triangle-count">220,000</strong><small>triangles</small></div>
+          <div><span>Source</span><strong id="point-count">125,207</strong><small>filtered points</small></div>
+          <div><span>GPS fit</span><strong id="gps-fit">1.28 m</strong><small>median horizontal</small></div>
+          <div><span>Coverage</span><strong id="coverage">55.16%</strong><small>2 m DSM cells</small></div>
+        </div>
+        <section class="quality">
+          <div><span>Visual reconstruction</span><b class="good">Verified</b></div>
+          <div><span>Registered cameras</span><b id="registered">242 / 242</b></div>
+          <div><span>Reprojection error</span><b id="reprojection">0.81 px</b></div>
+          <div><span>Coordinate reference</span><b id="crs">UTM 11N</b></div>
+        </section>
+        <p class="accuracy"><b>Accuracy note.</b> GPS agreement is measured internally. An independent GCP/checkpoint survey is still required before claiming absolute sub-metre accuracy.</p>
+        <div class="downloads">
+          <a class="primary" href="assets/presentation_mesh.glb" download>Download 3D model <span>GLB</span></a>
+          <a href="assets/georeferenced_point_cloud.las" download>Point cloud <span>LAS</span></a>
+          <a href="assets/surface_model.tif" download>Surface map <span>GeoTIFF</span></a>
+          <a href="assets/presentation_report.json" download>Quality report <span>JSON</span></a>
+        </div>
+      </aside>
+    </main>
+    <script src="presentation.js"></script>
+  </body>
+</html>

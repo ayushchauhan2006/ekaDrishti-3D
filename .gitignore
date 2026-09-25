@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.venv/
+outputs/
+data/processed/
+data/frames/
+
+# Raw flight data can be very large and may contain sensitive location data.
+data/raw/*
+!data/raw/.gitkeep
+# Per-mission reconstructions and dashboard mesh assets are generated locally.
+data/missions/
+dashboard/dist/assets/*
+!dashboard/dist/assets/.gitkeep
+tools/
+tmp/
+.pytest_cache/
