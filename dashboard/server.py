@@ -40,6 +40,14 @@ def _default_model_catalog() -> dict[str, object]:
                 "asset_base": "assets",
                 "status": "ready",
                 "source": "Current presentation model",
+                "mission": {
+                    "name": "DJI_0289",
+                    "frames_selected": 164,
+                    "triangles": 2513538,
+                    "gps_rmse_m": 0.065,
+                    "extent_east_m": 127,
+                    "extent_north_m": 100,
+                },
             }
         },
     }
@@ -67,6 +75,22 @@ def _write_model_catalog(catalog: dict[str, object]) -> None:
     temporary.replace(MODEL_CATALOG_PATH)
 
 
+def _mission_summary(report: dict[str, object]) -> dict[str, object]:
+    """Keep browser-facing mission facts small and independent of local paths."""
+    dense = report.get("dense") if isinstance(report.get("dense"), dict) else {}
+    alignment = report.get("alignment") if isinstance(report.get("alignment"), dict) else {}
+    dense_extent = dense.get("dense_extent_m") if isinstance(dense.get("dense_extent_m"), list) else []
+    video_name = Path(str(report.get("video") or "Drone mission")).stem or "Drone mission"
+    return {
+        "name": video_name,
+        "frames_selected": report.get("frames_selected") or report.get("reconstruction", {}).get("registered_images"),
+        "triangles": dense.get("textured_mesh_triangles") or report.get("mesh_triangles"),
+        "gps_rmse_m": alignment.get("horizontal_rmse_m") or alignment.get("verified_horizontal_rmse_m"),
+        "extent_east_m": dense_extent[0] if len(dense_extent) > 0 else report.get("extent_east_m"),
+        "extent_north_m": dense_extent[1] if len(dense_extent) > 1 else report.get("extent_north_m"),
+    }
+
+
 def _record_completed_model(profile: str, report: dict[str, object]) -> dict[str, object]:
     catalog = _read_model_catalog()
     catalog["models"][profile] = {
@@ -74,6 +98,7 @@ def _record_completed_model(profile: str, report: dict[str, object]) -> dict[str
         "asset_base": f"assets/models/{profile}",
         "status": "ready",
         "frames_selected": report.get("frames_selected"),
+        "mission": _mission_summary(report),
         "completed_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
     }
     catalog["active_mode"] = profile

@@ -15,7 +15,17 @@
   const activeModelLabel = document.querySelector("#active-model-label");
   const heroViewerLink = document.querySelector("#hero-viewer-link");
   const openModelLink = document.querySelector("#open-model-link");
-  const fallbackCatalog = { active_mode: "precision", models: { precision: { label: "Precision model", status: "ready", asset_base: "assets" } } };
+  const missionLabel = document.querySelector("#mission-label");
+  const missionHeading = document.querySelector("#mission-heading");
+  const missionDescription = document.querySelector("#mission-description");
+  const proofFrames = document.querySelector("#proof-frames");
+  const proofTriangles = document.querySelector("#proof-triangles");
+  const proofGps = document.querySelector("#proof-gps");
+  const metricTriangles = document.querySelector("#metric-triangles");
+  const metricFrames = document.querySelector("#metric-frames");
+  const metricGps = document.querySelector("#metric-gps");
+  const metricArea = document.querySelector("#metric-area");
+  const fallbackCatalog = { active_mode: "precision", models: { precision: { label: "Precision model", status: "ready", asset_base: "assets", mission: { name: "DJI_0289", frames_selected: 164, triangles: 2513538, gps_rmse_m: 0.065, extent_east_m: 127, extent_north_m: 100 } } } };
   const statusBox = document.createElement("div");
   statusBox.className = "run-indicator";
   statusBox.hidden = true;
@@ -31,16 +41,51 @@
 
   function viewerUrl(mode) { return "textured_viewer.html?mode=" + encodeURIComponent(mode); }
 
+  function formatMetric(value) {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return "—";
+    if (Math.abs(number) >= 1000000) return (number / 1000000).toFixed(2).replace(/\.?0+$/, "") + "M";
+    if (Math.abs(number) >= 1000) return (number / 1000).toFixed(1).replace(/\.?0+$/, "") + "K";
+    return String(Math.round(number));
+  }
+
+  function renderMissionSummary(summary, modelLabel) {
+    if (!summary || typeof summary !== "object") return;
+    const name = String(summary.name || "Drone mission");
+    const friendlyName = name.replaceAll("_", " ");
+    const frames = Number(summary.frames_selected);
+    const triangles = Number(summary.triangles);
+    const gpsMeters = Number(summary.gps_rmse_m);
+    const east = Number(summary.extent_east_m);
+    const north = Number(summary.extent_north_m);
+    if (missionLabel) missionLabel.textContent = name + " · " + modelLabel.toUpperCase() + " READY";
+    if (missionHeading) missionHeading.textContent = "Explore " + friendlyName + " in 3D.";
+    if (missionDescription) missionDescription.textContent = "Photo-textured 3D reconstruction built from " + name + " and its matching DJI telemetry. Inspect the real scene geometry visible in the uploaded flight.";
+    const frameText = Number.isFinite(frames) ? formatMetric(frames) : "—";
+    const triangleText = Number.isFinite(triangles) ? formatMetric(triangles) : "—";
+    const gpsText = Number.isFinite(gpsMeters) ? Math.round(gpsMeters * 100) + " cm" : "Telemetry";
+    const areaText = Number.isFinite(east) && Number.isFinite(north) ? Math.round(east) + " × " + Math.round(north) + " m" : "Observed area";
+    if (proofFrames) proofFrames.textContent = frameText;
+    if (proofTriangles) proofTriangles.textContent = triangleText;
+    if (proofGps) proofGps.textContent = gpsText;
+    if (metricFrames) metricFrames.textContent = frameText;
+    if (metricTriangles) metricTriangles.textContent = triangleText;
+    if (metricGps) metricGps.textContent = gpsText;
+    if (metricArea) metricArea.textContent = areaText;
+  }
+
   function renderModelCatalog(catalog) {
     const models = catalog && catalog.models && typeof catalog.models === "object" ? catalog.models : fallbackCatalog.models;
     const available = ["rapid", "precision"].filter(mode => models[mode] && models[mode].status === "ready");
     const active = available.includes(catalog && catalog.active_mode) ? catalog.active_mode : (available.includes("precision") ? "precision" : available[0]);
-    if (!active || available.length < 2) { modelLibrary.hidden = true; return; }
+    if (!active) { modelLibrary.hidden = true; return; }
     const activeModel = models[active];
     const activeLabel = activeModel.label || (active === "rapid" ? "Rapid preview" : "Precision model");
+    renderMissionSummary(activeModel.mission, activeLabel);
     activeModelLabel.textContent = activeLabel + " is the latest completed model";
     heroViewerLink.href = viewerUrl(active);
     openModelLink.href = viewerUrl(active);
+    if (available.length < 2) { modelLibrary.hidden = true; return; }
     modelSwitches.replaceChildren();
     available.forEach(mode => {
       const model = models[mode];

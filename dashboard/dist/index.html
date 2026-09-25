@@ -20,10 +20,10 @@
 
       <section class="mission-hero" aria-labelledby="mission-heading">
         <div class="hero-copy">
-          <p class="eyebrow">DJI_0289 · COMPLETED MISSION</p>
+          <p class="eyebrow" id="mission-label">DJI_0289 · COMPLETED MISSION</p>
           <h1 id="mission-heading">Explore the city in 3D.</h1>
-          <p>AI-audited, photo-textured metric reconstruction aligned with matching RTK telemetry. Inspect and measure the real roofs, trees, roads, and building geometry visible to the drone.</p>
-          <div class="hero-proof"><span><b>164</b> matched views</span><span><b>2.51M</b> surface triangles</span><span><b>6.5 cm</b> GPS agreement</span><span><b>AI</b> frame audit</span></div>
+          <p id="mission-description">AI-audited, photo-textured metric reconstruction aligned with matching RTK telemetry. Inspect and measure the real roofs, trees, roads, and building geometry visible to the drone.</p>
+          <div class="hero-proof"><span><b id="proof-frames">164</b> matched views</span><span><b id="proof-triangles">2.51M</b> surface triangles</span><span><b id="proof-gps">6.5 cm</b> GPS agreement</span><span><b>AI</b> frame audit</span></div>
         </div>
         <div class="hero-actions">
           <a class="viewer-feature" id="hero-viewer-link" href="textured_viewer.html?mode=precision">
@@ -40,10 +40,10 @@
       <section class="upload-notice" id="upload-notice" hidden aria-live="polite"></section>
 
       <section class="metric-grid mission-metrics" aria-label="Mission results">
-        <article class="metric"><span>3D surface</span><strong>2.51M</strong><small>photo-textured triangles</small></article>
-        <article class="metric"><span>Visual coverage</span><strong>164</strong><small>registered DJI frames</small></article>
-        <article class="metric"><span>GPS consistency</span><strong>6.5 cm</strong><small>internal horizontal agreement</small></article>
-        <article class="metric"><span>Mapped area</span><strong>127 × 100 m</strong><small>observed terrain footprint</small></article>
+        <article class="metric"><span>3D surface</span><strong id="metric-triangles">2.51M</strong><small>photo-textured triangles</small></article>
+        <article class="metric"><span>Visual coverage</span><strong id="metric-frames">164</strong><small>registered DJI frames</small></article>
+        <article class="metric"><span>GPS consistency</span><strong id="metric-gps">6.5 cm</strong><small>internal horizontal agreement</small></article>
+        <article class="metric"><span>Mapped area</span><strong id="metric-area">127 × 100 m</strong><small>observed terrain footprint</small></article>
       </section>
 
       <section class="outcome-grid">
@@ -78,6 +78,6 @@
         <p>For any stated absolute-accuracy threshold, complete one of the supplied checkpoint or reference-dimension CSV templates and run the independent evaluator.</p>
       </dialog>
     </main>
-    <script src="app.js"></script><script src="process.js?v=processing-control-2"></script>
+    <script src="app.js"></script><script src="process.js?v=mission-metadata"></script>
   </body>
 </html>
