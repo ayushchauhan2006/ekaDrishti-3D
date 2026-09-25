@@ -24,7 +24,59 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 STATIC_ROOT = PROJECT_ROOT / "dashboard" / "dist"
 MISSIONS_ROOT = PROJECT_ROOT / "data" / "missions"
 MAX_UPLOAD_BYTES = int(2.5 * 1024 * 1024 * 1024)
+ASSETS_ROOT = STATIC_ROOT / "assets"
+MODEL_CATALOG_PATH = ASSETS_ROOT / "model_catalog.json"
 
+
+def _default_model_catalog() -> dict[str, object]:
+    return {
+        "version": 1,
+        "active_mode": "precision",
+        "models": {
+            "precision": {
+                "label": "Precision model",
+                "asset_base": "assets",
+                "status": "ready",
+                "source": "Current presentation model",
+            }
+        },
+    }
+
+
+def _read_model_catalog() -> dict[str, object]:
+    catalog = _default_model_catalog()
+    try:
+        saved = json.loads(MODEL_CATALOG_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return catalog
+    if not isinstance(saved, dict) or not isinstance(saved.get("models"), dict):
+        return catalog
+    catalog["models"].update(saved["models"])
+    active_mode = saved.get("active_mode")
+    if active_mode in catalog["models"]:
+        catalog["active_mode"] = active_mode
+    return catalog
+
+
+def _write_model_catalog(catalog: dict[str, object]) -> None:
+    MODEL_CATALOG_PATH.parent.mkdir(parents=True, exist_ok=True)
+    temporary = MODEL_CATALOG_PATH.with_suffix(".tmp")
+    temporary.write_text(json.dumps(catalog, indent=2) + "\n", encoding="utf-8")
+    temporary.replace(MODEL_CATALOG_PATH)
+
+
+def _record_completed_model(profile: str, report: dict[str, object]) -> dict[str, object]:
+    catalog = _read_model_catalog()
+    catalog["models"][profile] = {
+        "label": "Rapid preview" if profile == "rapid" else "Precision model",
+        "asset_base": f"assets/models/{profile}",
+        "status": "ready",
+        "frames_selected": report.get("frames_selected"),
+        "completed_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+    }
+    catalog["active_mode"] = profile
+    _write_model_catalog(catalog)
+    return catalog
 
 class JobState:
     def __init__(self) -> None:
@@ -55,11 +107,12 @@ def _usable_telemetry(telemetry: Path) -> bool:
         return False
 
 
-def _run_reconstruction(job_id: str, video: Path, telemetry: Path, workspace: Path) -> None:
+def _run_reconstruction(job_id: str, video: Path, telemetry: Path, workspace: Path, profile: str) -> None:
+    profile_assets = ASSETS_ROOT / "models" / profile
     command = [
         str(PROJECT_ROOT / ".venv/bin/python") if (PROJECT_ROOT / ".venv/bin/python").is_file() else sys.executable, "-u", "-m", "src.ekadrishti.full_pipeline",
         "--video", str(video), "--telemetry", str(telemetry), "--workspace", str(workspace),
-        "--project-root", str(PROJECT_ROOT), "--interval-seconds", "0.5", "--use-gpu",
+        "--project-root", str(PROJECT_ROOT), "--profile", profile, "--publish-directory", str(profile_assets), "--use-gpu",
     ]
     log: list[str] = []
     try:
@@ -81,7 +134,8 @@ def _run_reconstruction(job_id: str, video: Path, telemetry: Path, workspace: Pa
             raise RuntimeError(log[-1] if log else "The reconstruction process stopped unexpectedly.")
         report_path = workspace / "outputs" / "reconstruction_report.json"
         report = json.loads(report_path.read_text(encoding="utf-8")) if report_path.is_file() else {}
-        JOB.update(status="complete", stage="Presentation-ready 3D reconstruction complete", result=report, log=log)
+        catalog = _record_completed_model(profile, report)
+        JOB.update(status="complete", stage=f"{catalog['models'][profile]['label']} ready to inspect", result=report, profile=profile, models=catalog, log=log)
     except Exception as error:  # Keep the server alive so the dashboard can show the failure.
         JOB.update(status="failed", stage="Processing stopped", message=str(error), log=log)
 
@@ -107,6 +161,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
         request_path = urlparse(self.path).path
         if request_path == "/api/status":
             self._json(JOB.snapshot())
+            return
+        if request_path == "/api/models":
+            self._json(_read_model_catalog())
             return
         relative = "index.html" if request_path in ("", "/") else request_path.lstrip("/")
         candidate = (STATIC_ROOT / relative).resolve()
@@ -146,6 +203,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
         )
         video_field = form["video"] if "video" in form else None
         telemetry_field = form["telemetry"] if "telemetry" in form else None
+        profile = form.getfirst("profile", "precision")
+        if profile not in {"rapid", "precision"}:
+            self._error("Processing profile must be rapid or precision.")
+            return
         if not getattr(video_field, "filename", None) or not getattr(telemetry_field, "filename", None):
             self._error("Select both a drone MP4 and its matching DJI SRT file.")
             return
@@ -167,7 +228,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             return
         workspace = MISSIONS_ROOT / job_id / "work"
         JOB.update(status="running", job_id=job_id, stage="Mission received", message="Starting local reconstruction", result={}, log=[])
-        thread = threading.Thread(target=_run_reconstruction, args=(job_id, video_path, telemetry_path, workspace), daemon=True)
+        thread = threading.Thread(target=_run_reconstruction, args=(job_id, video_path, telemetry_path, workspace, profile), daemon=True)
         thread.start()
         self._json(JOB.snapshot(), HTTPStatus.ACCEPTED)
 

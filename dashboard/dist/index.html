@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#071b2c" />
     <title>EkaDrishti 3D | Mission Console</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-    <link rel="stylesheet" href="styles.css?v=focus-dashboard" />
+    <link rel="stylesheet" href="styles.css?v=model-library-2" /><link rel="stylesheet" href="compliance.css?v=model-library" />
   </head>
   <body>
     <main class="shell focused-shell">
@@ -22,17 +22,17 @@
         <div class="hero-copy">
           <p class="eyebrow">DJI_0289 · COMPLETED MISSION</p>
           <h1 id="mission-heading">Explore the city in 3D.</h1>
-          <p>Photo-textured reconstruction, aligned with matching RTK telemetry. Inspect the real roofs, trees, roads, and building geometry captured by the drone.</p>
-          <div class="hero-proof"><span><b>164</b> matched views</span><span><b>2.51M</b> terrain triangles</span><span><b>6.5 cm</b> GPS agreement</span></div>
+          <p>AI-audited, photo-textured metric reconstruction aligned with matching RTK telemetry. Inspect and measure the real roofs, trees, roads, and building geometry visible to the drone.</p>
+          <div class="hero-proof"><span><b>164</b> matched views</span><span><b>2.51M</b> surface triangles</span><span><b>6.5 cm</b> GPS agreement</span><span><b>AI</b> frame audit</span></div>
         </div>
         <div class="hero-actions">
-          <a class="viewer-feature" href="textured_viewer.html?ui=polish">
+          <a class="viewer-feature" id="hero-viewer-link" href="textured_viewer.html?mode=precision">
             <span class="viewer-orbit">3D</span><span><strong>Explore interactive 3D model</strong><small>Orbit 360°, zoom close, and inspect every visible surface</small></span><b>→</b>
           </a>
-          <div class="mission-tools">
+          <div class="mission-tools"><div class="new-run-settings"><label class="profile-control"><span>New run quality</span><select id="processing-profile"><option value="rapid">Rapid preview</option><option value="precision" selected>Precision model</option></select></label><small>Used only when you process a newly uploaded mission.</small></div>
             <label class="button secondary" for="mission-files">New DJI MP4 + SRT<input id="mission-files" type="file" accept="video/mp4,video/quicktime,.mp4,.mov,.srt" multiple hidden /></label>
             <button class="button primary" id="process-button" type="button">Start reconstruction</button>
-          </div>
+          </div><section class="model-library" id="model-library" aria-label="Available 3D model results"><div class="model-library-copy"><p class="eyebrow">AVAILABLE 3D RESULTS</p><strong id="active-model-label">Precision model is ready</strong><small>Choose a completed reconstruction to inspect it in the 3D viewer.</small></div><div class="model-switches" id="model-switches"></div></section>
         </div>
       </section>
 
@@ -48,14 +48,14 @@
       <section class="outcome-grid">
         <article class="panel explore-panel">
           <div class="panel-heading"><div><p class="eyebrow">MAIN FEATURE</p><h2>Your interactive 3D world</h2></div><span class="pill success">Ready now</span></div>
-          <p class="panel-copy">The primary experience is the textured 3D viewer—not a static report. Rotate above or below the model, zoom into a roof, and pan across the compound.</p>
-          <a class="open-model-button" href="textured_viewer.html?ui=polish">Open the 3D viewer <span>→</span></a>
-          <div class="feature-list"><span>360° free orbit</span><span>Photo-real texture</span><span>RTK-aligned</span></div>
+          <p class="panel-copy">The primary experience is the metric textured 3D viewer. Rotate above or below the model, zoom into a roof, pan across the compound, and measure two observed surface points.</p>
+          <a class="open-model-button" id="open-model-link" href="textured_viewer.html?mode=precision">Open the 3D viewer <span>→</span></a>
+          <div class="feature-list"><span>360° free orbit</span><span>Metric measurement</span><span>AI frame audit</span><span>RTK-aligned</span></div>
         </article>
         <article class="panel trust-panel">
           <div class="panel-heading"><div><p class="eyebrow">MISSION CONFIDENCE</p><h2>What the result means</h2></div></div>
           <div class="trust-row"><b>✓</b><div><strong>Real scene geometry</strong><small>Built from overlapping drone frames, not generated imagery.</small></div></div>
-          <div class="trust-row"><b>✓</b><div><strong>Located by RTK telemetry</strong><small>Camera path is aligned to the original DJI flight data.</small></div></div>
+          <div class="trust-row"><b>✓</b><div><strong>AI dynamic-object audit</strong><small>All 164 frames were checked; no qualifying people, vehicles, or animals were found.</small></div></div><div class="trust-row"><b>✓</b><div><strong>Located by RTK telemetry</strong><small>Camera path is aligned to the original DJI flight data.</small></div></div>
           <div class="trust-row"><b>!</b><div><strong>Use checkpoints for surveying</strong><small>Ground control is still needed before making an absolute accuracy claim.</small></div></div>
         </article>
       </section>
@@ -64,7 +64,7 @@
         <summary>Mission processing record <span>View technical steps</span></summary>
         <ol class="pipeline" id="pipeline">
           <li class="done"><span class="step-icon">✓</span><div><strong>Mission input validated</strong><small>Original DJI video and matching RTK SRT accepted</small></div><time>Done</time></li>
-          <li class="done"><span class="step-icon">✓</span><div><strong>Visual reconstruction</strong><small>164 camera views registered into one scene</small></div><time>Done</time></li>
+          <li class="done"><span class="step-icon">✓</span><div><strong>AI frame audit</strong><small>164 frames checked for people, vehicles, and animals</small></div><time>Verified</time></li><li class="done"><span class="step-icon">✓</span><div><strong>Visual reconstruction</strong><small>164 camera views registered into one scene</small></div><time>Done</time></li>
           <li class="done"><span class="step-icon">✓</span><div><strong>RTK alignment</strong><small>6.5 cm internal horizontal GPS agreement</small></div><time>Verified</time></li>
           <li class="done"><span class="step-icon">✓</span><div><strong>Dense model and texture</strong><small>2.51 million photo-textured triangles produced</small></div><time>Done</time></li>
         </ol>
@@ -74,7 +74,7 @@
         <button class="dialog-close" id="close-dialog" aria-label="Close">×</button>
         <p class="eyebrow">ACCURACY NOTE</p><h2>How to present this result</h2>
         <p>EkaDrishti reconstructs the visible scene from overlapping drone frames, then aligns the camera path using the matching DJI RTK telemetry.</p>
-        <p>For survey-grade claims, validate the mission with independent ground-control checkpoints.</p>
+        <p>For any stated absolute-accuracy threshold, complete one of the supplied checkpoint or reference-dimension CSV templates and run the independent evaluator.</p>
       </dialog>
     </main>
     <script src="app.js"></script><script src="process.js"></script>

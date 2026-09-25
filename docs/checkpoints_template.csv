@@ -1,0 +1,5 @@
+name,model_x_m,model_y_m,model_z_m,reference_x_m,reference_y_m,reference_z_m
+CP01,0,0,0,0,0,0
+CP02,10,0,0,10,0,0
+CP03,0,10,0,0,10,0
+CP04,10,10,2,10,10,2
