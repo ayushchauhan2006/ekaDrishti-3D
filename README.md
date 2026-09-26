@@ -28,6 +28,18 @@ The telemetry figures measure agreement between reconstructed camera centres and
 
 ## Open the presentation
 
+The dashboard UI is built with React and served by the existing local Python API
+server. After cloning or pulling the repository, install the frontend packages
+and create the production bundle once:
+
+```bash
+cd /home/ayush/repos/ekaDrishti-3D/dashboard
+npm install
+npm run build
+```
+
+Then start the local dashboard from the project root:
+
 ```bash
 cd /home/ayush/repos/ekaDrishti-3D
 .venv/bin/python dashboard/server.py
@@ -36,6 +48,10 @@ cd /home/ayush/repos/ekaDrishti-3D
 Open <http://127.0.0.1:4173>. The metric textured viewer supports 360° orbit, pan, zoom, and point-to-point surface measurements in metres. The dashboard also exposes **Rapid preview** and **Precision model** processing modes for a new MP4 + SRT mission.
 
 Published artifacts are in `dashboard/dist/assets/`:
+
+For frontend development, keep the Python server running in one terminal and
+run `npm run dev` from `dashboard/`; Vite serves the React source on port 5173
+and proxies the API and existing 3D viewer assets to port 4173.
 
 - `dense_textured_mesh.ply` and `dense_texture.png` — metric photo-textured surface
 - `dense_point_cloud.ply` — browser-sized metric dense cloud
