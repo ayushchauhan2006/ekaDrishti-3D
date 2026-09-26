@@ -25,7 +25,7 @@
   const metricFrames = document.querySelector("#metric-frames");
   const metricGps = document.querySelector("#metric-gps");
   const metricArea = document.querySelector("#metric-area");
-  const fallbackCatalog = { active_mode: "precision", models: { precision: { label: "Precision model", status: "ready", asset_base: "assets", mission: { name: "DJI_0289", frames_selected: 164, triangles: 2513538, gps_rmse_m: 0.065, extent_east_m: 127, extent_north_m: 100 } } } };
+  const fallbackCatalog = { active_mode: null, models: {} };
   const statusBox = document.createElement("div");
   statusBox.className = "run-indicator";
   statusBox.hidden = true;
@@ -41,6 +41,16 @@
 
   function viewerUrl(mode) { return "textured_viewer.html?mode=" + encodeURIComponent(mode); }
 
+  function missionNameFromFile(file) {
+    const filename = typeof file === "string" ? file : file && file.name;
+    const basename = String(filename || "Drone mission").split(/[\\/]/).pop();
+    return basename.replace(/\.[^.]+$/, "") || "Drone mission";
+  }
+
+  function friendlyMissionName(name) {
+    return String(name).replaceAll("_", " ");
+  }
+
   function formatMetric(value) {
     const number = Number(value);
     if (!Number.isFinite(number)) return "—";
@@ -52,7 +62,7 @@
   function renderMissionSummary(summary, modelLabel) {
     if (!summary || typeof summary !== "object") return;
     const name = String(summary.name || "Drone mission");
-    const friendlyName = name.replaceAll("_", " ");
+    const friendlyName = friendlyMissionName(name);
     const frames = Number(summary.frames_selected);
     const triangles = Number(summary.triangles);
     const gpsMeters = Number(summary.gps_rmse_m);
@@ -72,6 +82,17 @@
     if (metricTriangles) metricTriangles.textContent = triangleText;
     if (metricGps) metricGps.textContent = gpsText;
     if (metricArea) metricArea.textContent = areaText;
+  }
+
+  function renderSelectedMission(video) {
+    if (!video) return;
+    const name = missionNameFromFile(video);
+    const friendlyName = friendlyMissionName(name);
+    const profileLabel = selectedProfileLabel();
+    [proofFrames, proofTriangles, proofGps, metricFrames, metricTriangles, metricGps, metricArea].forEach((element) => { if (element) element.textContent = "—"; });
+    if (missionLabel) missionLabel.textContent = name + " · " + profileLabel.toUpperCase() + " SELECTED";
+    if (missionHeading) missionHeading.textContent = "Build " + friendlyName + " in 3D.";
+    if (missionDescription) missionDescription.textContent = "Ready to build a photo-textured 3D reconstruction from " + name + " and its matching DJI telemetry.";
   }
 
   function renderModelCatalog(catalog) {
@@ -195,6 +216,7 @@
 
   function showSelection() {
     const selection = selectedFiles();
+    renderSelectedMission(selection.video);
     videoUploadState.textContent = selection.video ? "✓ Video: " + selection.video.name : "Video: waiting";
     telemetryUploadState.textContent = selection.telemetry ? "✓ SRT: " + selection.telemetry.name : "SRT: waiting";
     uploadFeedback.classList.toggle("complete", Boolean(selection.video && selection.telemetry));
