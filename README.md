@@ -127,3 +127,5 @@ The tests cover metric transform recovery, binary PLY transformation, dynamic-fr
 ## Known reconstruction boundary
 
 The system reconstructs surfaces visible in the single pass. Poisson filling may close small gaps, but genuinely occluded geometry is not presented as observed truth. Capture sufficient oblique overlap for façades and sides, and use the confidence/validation outputs when measurements matter.
+
+TEAM NEXORA
