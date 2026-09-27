@@ -108,7 +108,7 @@ function MissionHero({ catalog, activeModel, activeMode, pendingName, profile, o
         </div>
       </div>
       <div className="hero-actions">
-        <a className="viewer-feature" id="hero-viewer-link" href={viewerUrl(activeMode)}>
+        <a className="viewer-feature" id="hero-viewer-link" href={viewerUrl(activeMode)} target="_blank" rel="noopener">
           <span className="viewer-orbit">3D</span>
           <span><strong>Explore interactive 3D model</strong><small>Orbit 360°, zoom close, and inspect every visible surface</small></span>
           <b>→</b>
@@ -158,7 +158,7 @@ function ModelLibrary({ catalog }) {
     <section className="model-library" aria-label="Available 3D model results">
       <div className="model-library-copy"><p className="eyebrow">AVAILABLE 3D RESULTS</p><strong>{catalog.models[active]?.label || "Model"} is the latest completed model</strong><small>Choose a completed reconstruction to inspect it in the 3D viewer.</small></div>
       <div className="model-switches">
-        {available.map((mode) => <a key={mode} className={"model-choice" + (mode === active ? " active" : "")} href={viewerUrl(mode)}><strong>{catalog.models[mode].label}</strong><small>{mode === active ? "Latest completed · Open viewer" : "Completed result · Open viewer"}</small></a>)}
+        {available.map((mode) => <a key={mode} className={"model-choice" + (mode === active ? " active" : "")} href={viewerUrl(mode)} target="_blank" rel="noopener"><strong>{catalog.models[mode].label}</strong><small>{mode === active ? "Latest completed · Open viewer" : "Completed result · Open viewer"}</small></a>)}
       </div>
     </section>
   );
@@ -170,7 +170,7 @@ function OutcomePanels({ activeMode, onAccuracy }) {
       <article className="panel explore-panel">
         <div className="panel-heading"><div><p className="eyebrow">MAIN FEATURE</p><h2>Your interactive 3D world</h2></div><span className="pill success">Ready now</span></div>
         <p className="panel-copy">The primary experience is the metric textured 3D viewer. Rotate above or below the model, zoom into a roof, pan across the compound, and measure two observed surface points.</p>
-        <a className="open-model-button" href={viewerUrl(activeMode)}>Open the 3D viewer <span>→</span></a>
+        <a className="open-model-button" href={viewerUrl(activeMode)} target="_blank" rel="noopener">Open the 3D viewer <span>→</span></a>
         <div className="feature-list"><span>360° free orbit</span><span>Metric measurement</span><span>AI frame audit</span><span>RTK-aligned</span></div>
       </article>
       <article className="panel trust-panel">

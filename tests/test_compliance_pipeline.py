@@ -69,3 +69,15 @@ def test_rapid_and_precision_profiles_are_ordered() -> None:
     assert SPARSE_PROFILES["rapid"]["interval_seconds"] > SPARSE_PROFILES["precision"]["interval_seconds"]
     assert SPARSE_PROFILES["rapid"]["feature_size"] < SPARSE_PROFILES["precision"]["feature_size"]
     assert DENSE_PROFILES["rapid"]["dense_max_image_size"] < DENSE_PROFILES["precision"]["dense_max_image_size"]
+
+
+def test_navigation_does_not_cancel_background_reconstruction() -> None:
+    project_root = Path(__file__).resolve().parents[1]
+    legacy_frontend = (project_root / "dashboard/dist/process.js").read_text(encoding="utf-8")
+    react_frontend = (project_root / "dashboard/frontend/src/main.jsx").read_text(encoding="utf-8")
+    for frontend in (legacy_frontend, react_frontend):
+        assert "addEventListener(\"pagehide\"" not in frontend
+        assert "sendBeacon(\"/api/cancel\"" not in frontend
+    assert "fetch(\"/api/cancel\", { method: \"POST\" })" in legacy_frontend
+    assert "fetch(\"/api/cancel\", { method: \"POST\" })" in react_frontend
+    assert react_frontend.count("target=\"_blank\" rel=\"noopener\"") == 3

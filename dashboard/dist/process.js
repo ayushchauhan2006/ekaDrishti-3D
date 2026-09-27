@@ -280,12 +280,6 @@
     }
   });
 
-  addEventListener("pagehide", () => {
-    if (processingActive && navigator.sendBeacon) {
-      navigator.sendBeacon("/api/cancel", new Blob([], { type: "text/plain" }));
-    }
-  });
-
   refreshRunButton();
   loadModelCatalog();
   checkStatus();
