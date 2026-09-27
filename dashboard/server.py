@@ -33,23 +33,8 @@ MODEL_CATALOG_PATH = ASSETS_ROOT / "model_catalog.json"
 def _default_model_catalog() -> dict[str, object]:
     return {
         "version": 1,
-        "active_mode": "precision",
-        "models": {
-            "precision": {
-                "label": "Precision model",
-                "asset_base": "assets",
-                "status": "ready",
-                "source": "Current presentation model",
-                "mission": {
-                    "name": "DJI_0289",
-                    "frames_selected": 164,
-                    "triangles": 2513538,
-                    "gps_rmse_m": 0.065,
-                    "extent_east_m": 127,
-                    "extent_north_m": 100,
-                },
-            }
-        },
+        "active_mode": None,
+        "models": {},
     }
 
 
@@ -91,17 +76,18 @@ def _mission_summary(report: dict[str, object]) -> dict[str, object]:
     }
 
 
-def _record_completed_model(profile: str, report: dict[str, object]) -> dict[str, object]:
+def _record_completed_model(job_id: str, profile: str, report: dict[str, object]) -> dict[str, object]:
+    """Add a completed run to the archive without replacing an earlier PLY."""
     catalog = _read_model_catalog()
-    catalog["models"][profile] = {
+    catalog["models"][job_id] = {
         "label": "Rapid preview" if profile == "rapid" else "Precision model",
-        "asset_base": f"assets/models/{profile}",
+        "asset_base": f"assets/models/{job_id}",
         "status": "ready",
         "frames_selected": report.get("frames_selected"),
         "mission": _mission_summary(report),
         "completed_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
     }
-    catalog["active_mode"] = profile
+    catalog["active_mode"] = job_id
     _write_model_catalog(catalog)
     return catalog
 
@@ -154,7 +140,9 @@ def _usable_telemetry(telemetry: Path) -> bool:
 
 def _run_reconstruction(job_id: str, video: Path, telemetry: Path, workspace: Path, profile: str) -> None:
     global ACTIVE_PROCESS
-    profile_assets = ASSETS_ROOT / "models" / profile
+    # Each mission receives an immutable asset directory so its PLY remains
+    # selectable in the dashboard's local model archive.
+    profile_assets = ASSETS_ROOT / "models" / job_id
     command = [
         str(PROJECT_ROOT / ".venv/bin/python") if (PROJECT_ROOT / ".venv/bin/python").is_file() else sys.executable, "-u", "-m", "src.ekadrishti.full_pipeline",
         "--video", str(video), "--telemetry", str(telemetry), "--workspace", str(workspace),
@@ -187,8 +175,8 @@ def _run_reconstruction(job_id: str, video: Path, telemetry: Path, workspace: Pa
             raise RuntimeError(log[-1] if log else "The reconstruction process stopped unexpectedly.")
         report_path = workspace / "outputs" / "reconstruction_report.json"
         report = json.loads(report_path.read_text(encoding="utf-8")) if report_path.is_file() else {}
-        catalog = _record_completed_model(profile, report)
-        JOB.update(status="complete", stage=f"{catalog['models'][profile]['label']} ready to inspect", result=report, profile=profile, models=catalog, log=log)
+        catalog = _record_completed_model(job_id, profile, report)
+        JOB.update(status="complete", stage=f"{catalog['models'][job_id]['label']} ready to inspect", result=report, profile=profile, models=catalog, log=log)
     except Exception as error:  # Keep the server alive so the dashboard can show the failure.
         if JOB.snapshot().get("cancel_requested"):
             JOB.update(status="cancelled", stage="Reconstruction stopped", message="No partial model was published.", log=log)

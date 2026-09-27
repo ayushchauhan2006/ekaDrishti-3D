@@ -22,7 +22,7 @@ const modelStatus = document.querySelector("#model-status");
 const meshTitle = document.querySelector("#mesh-title");
 const modelSourceNote = document.querySelector("#model-source-note");
 const modelDownload = document.querySelector("#model-download");
-const fallbackCatalog = { active_mode: "precision", models: { precision: { label: "Precision model", asset_base: "assets", status: "ready" } } };
+const fallbackCatalog = { active_mode: null, models: {} };
 
 let yaw = 3.9, pitch = -1.45, distance = 1.22, panX = 0, panY = 0;
 let panning = false, dragging = false, moved = false, lastPointer, pointerStart;
@@ -89,7 +89,7 @@ async function selectModel(){
   const models=catalog&&catalog.models&&typeof catalog.models==="object"?catalog.models:fallbackCatalog.models;
   const available=Object.keys(models).filter(mode=>models[mode]&&models[mode].status==="ready");
   const mode=available.includes(requestedMode)?requestedMode:(available.includes(catalog.active_mode)?catalog.active_mode:(available.includes("precision")?"precision":available[0]));
-  if(!mode)throw new Error("No completed 3D model is available yet. Process a Rapid preview or Precision model first.");
+  if(!mode)throw new Error("Add Video and Telemetry data to make a 3d model");
   const model=Object.assign({label:mode==="rapid"?"Rapid preview":"Precision model",asset_base:"assets"},models[mode]);
   model.mode=mode;
   modelTitle.textContent=model.label+" · photo-textured 3D";
@@ -156,3 +156,18 @@ inspectorToggle.addEventListener("click",()=>{const collapsed=inspector.classLis
 addEventListener("resize",()=>{if(matchMedia("(max-width: 840px)").matches){inspector.style.left="";inspector.style.top="";inspector.style.right="";return;}if(inspector.style.left){const rect=inspector.getBoundingClientRect();moveInspector(rect.left,rect.top);}});
 
 selectModel().then(model=>{loadValidation(model);return Promise.all([fetch(assetPath(model,"dense_textured_mesh.ply")).then(response=>{if(!response.ok)throw new Error(model.label+" mesh could not be loaded.");return response.arrayBuffer();}),loadImage(assetPath(model,"dense_texture.png"))]);}).then(([mesh,image])=>{setup(parseMesh(mesh),image);loading.hidden=true;requestAnimationFrame(render);}).catch(error=>{loading.hidden=true;errorBox.hidden=false;errorBox.textContent=error.message;});
+const fullscreenButton = document.createElement("button");
+fullscreenButton.type = "button";
+fullscreenButton.className = "fullscreen-model";
+fullscreenButton.textContent = "Fullscreen ⛶";
+fullscreenButton.setAttribute("aria-label", "Open model viewer in fullscreen");
+document.querySelector(".viewer-header").append(fullscreenButton);
+fullscreenButton.addEventListener("click", async () => {
+  try {
+    if (document.fullscreenElement) await document.exitFullscreen();
+    else await document.documentElement.requestFullscreen();
+  } catch { /* Fullscreen may be blocked by an older browser. */ }
+});
+document.addEventListener("fullscreenchange", () => {
+  fullscreenButton.textContent = document.fullscreenElement ? "Exit fullscreen ×" : "Fullscreen ⛶";
+});
