@@ -46,8 +46,14 @@ def _safe_filename(filename: str, suffix: str) -> str:
 
 
 def _run_reconstruction(job_id: str, video: Path, telemetry: Path, workspace: Path) -> None:
+    python_exe = sys.executable
+    if os.name == 'nt' and (PROJECT_ROOT / ".venv/Scripts/python.exe").is_file():
+        python_exe = str(PROJECT_ROOT / ".venv/Scripts/python.exe")
+    elif (PROJECT_ROOT / ".venv/bin/python").is_file():
+        python_exe = str(PROJECT_ROOT / ".venv/bin/python")
+
     command = [
-        str(PROJECT_ROOT / ".venv/bin/python") if (PROJECT_ROOT / ".venv/bin/python").is_file() else sys.executable, "-u", "-m", "src.ekadrishti.full_pipeline",
+        python_exe, "-u", "-m", "src.ekadrishti.full_pipeline",
         "--video", str(video), "--telemetry", str(telemetry), "--workspace", str(workspace),
         "--project-root", str(PROJECT_ROOT), "--interval-seconds", "0.5",
     ]

@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "active_mode": "precision",
+  "models": {
+    "precision": {
+      "label": "Precision model",
+      "asset_base": "assets/models/precision",
+      "status": "ready",
+      "frames_selected": 34,
+      "mission": {
+        "name": "DJI_CIRCULAR_BUILDING",
+        "frames_selected": 34,
+        "triangles": 97790,
+        "gps_rmse_m": 0.3692994293376641,
+        "extent_east_m": 119.0,
+        "extent_north_m": 142.63
+      },
+      "completed_at": "2026-09-27T11:25:18"
+    }
+  }
+}

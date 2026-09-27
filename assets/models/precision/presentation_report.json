@@ -1,0 +1,90 @@
+{
+  "status": "presentation_ready",
+  "source": "single-pass video photogrammetry",
+  "geometry_class": "confidence-filtered sparse-derived surface",
+  "points_raw": 28740,
+  "points_retained": 28080,
+  "mesh_vertices": 49147,
+  "mesh_triangles": 97790,
+  "extent_east_m": 119.0,
+  "extent_north_m": 142.63,
+  "extent_vertical_m": 22.51,
+  "median_point_spacing_m": 0.125,
+  "processing_seconds": 3.72,
+  "crs": "EPSG:32632",
+  "artifacts": {
+    "point_cloud_ply": "georeferenced_point_cloud.ply",
+    "confidence_ply": "confidence_point_cloud.ply",
+    "mesh_ply": "presentation_mesh.ply",
+    "mesh_obj": "presentation_mesh.obj",
+    "mesh_glb": "presentation_mesh.glb",
+    "point_cloud_las": "georeferenced_point_cloud.las",
+    "surface_geotiff": "surface_model.tif"
+  },
+  "confidence": {
+    "median_neighbor_radius_m": 0.412,
+    "high_confidence_percent": 69.38
+  },
+  "dsm": {
+    "resolution_m": 2.0,
+    "width": 61,
+    "height": 73,
+    "coverage_percent": 59.94
+  },
+  "measurement_policy": "Measurements apply to observed photogrammetric geometry; inferred surfaces must be labelled separately.",
+  "video": "/home/ayush/repos/ekaDrishti-3D/data/missions/20260927-110811-7ae04c/raw/DJI_CIRCULAR_BUILDING.MOV",
+  "telemetry": "/home/ayush/repos/ekaDrishti-3D/data/missions/20260927-110811-7ae04c/raw/DJI_CIRCULAR_BUILDING.SRT",
+  "alignment": {
+    "frame_shift": 0,
+    "time_shift_seconds": 0.0,
+    "scale": 8.491213445872175,
+    "three_dimensional_rmse_m": 0.6797017677205719,
+    "horizontal_rmse_m": 0.3692994293376641,
+    "horizontal_median_m": 0.316638154380372,
+    "reference_count": 34,
+    "utm_epsg": 32632,
+    "origin_latitude": 46.5168227,
+    "origin_longitude": 6.5621113,
+    "origin_altitude_m": 362.805,
+    "verified_camera_count": 34,
+    "verified_3d_rmse_m": 0.6797,
+    "verified_horizontal_rmse_m": 0.3693,
+    "verified_horizontal_median_m": 0.3166,
+    "verified_maximum_3d_error_m": 1.196,
+    "rotation_matrix": [
+      [
+        -0.27742220923151817,
+        -0.7598586112186131,
+        0.5879216008806147
+      ],
+      [
+        -0.9597074784216549,
+        0.19070234606255523,
+        -0.20638355328801605
+      ],
+      [
+        0.04470429159100801,
+        -0.6214881383929696,
+        -0.7821470578799029
+      ]
+    ],
+    "translation_m": [
+      -31.895908450737473,
+      0.6967599359055079,
+      0.48635043151504687
+    ]
+  },
+  "reconstruction": {
+    "registered_images": 34,
+    "points": 28740,
+    "observations": 137413,
+    "mean_track_length": 4.781246,
+    "mean_reprojection_error_px": 0.507912
+  },
+  "stage_seconds": {
+    "alignment": 1.33,
+    "point_cloud_export": 0.08
+  },
+  "total_finalization_seconds": 6.84,
+  "accuracy_status": "GPS consistency measured; independent checkpoints are still required for an absolute <=1 m claim."
+}

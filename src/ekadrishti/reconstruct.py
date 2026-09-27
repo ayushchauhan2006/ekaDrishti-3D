@@ -73,7 +73,10 @@ def main() -> None:
         parser.error("Video and telemetry must be existing files.")
     profile = dict(PROFILES[args.profile])
     interval = args.interval_seconds if args.interval_seconds is not None else float(profile["interval_seconds"])
+    import os
     cuda_colmap = project_root / "tools/colmap-cuda/build/src/colmap/exe/colmap"
+    if os.name == 'nt':
+        cuda_colmap = project_root / "tools/colmap-cuda/build/src/colmap/exe/colmap.exe"
     colmap = str(cuda_colmap) if args.use_gpu and cuda_colmap.is_file() else "colmap"
     if args.use_gpu and not cuda_colmap.is_file():
         parser.error(f"CUDA COLMAP build is missing: {cuda_colmap}")

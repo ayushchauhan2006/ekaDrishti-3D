@@ -122,7 +122,11 @@ def _cancel_active_reconstruction() -> bool:
             message="Cancellation requested",
             cancel_requested=True,
         )
-        os.killpg(process.pid, signal.SIGTERM)
+        if os.name == 'nt':
+            process.send_signal(signal.CTRL_BREAK_EVENT)
+            process.kill()
+        else:
+            os.killpg(process.pid, signal.SIGTERM)
         return True
 
 
@@ -143,16 +147,28 @@ def _run_reconstruction(job_id: str, video: Path, telemetry: Path, workspace: Pa
     # Each mission receives an immutable asset directory so its PLY remains
     # selectable in the dashboard's local model archive.
     profile_assets = ASSETS_ROOT / "models" / job_id
+    python_exe = sys.executable
+    if os.name == 'nt' and (PROJECT_ROOT / ".venv/Scripts/python.exe").is_file():
+        python_exe = str(PROJECT_ROOT / ".venv/Scripts/python.exe")
+    elif (PROJECT_ROOT / ".venv/bin/python").is_file():
+        python_exe = str(PROJECT_ROOT / ".venv/bin/python")
+
     command = [
-        str(PROJECT_ROOT / ".venv/bin/python") if (PROJECT_ROOT / ".venv/bin/python").is_file() else sys.executable, "-u", "-m", "src.ekadrishti.full_pipeline",
+        python_exe, "-u", "-m", "src.ekadrishti.full_pipeline",
         "--video", str(video), "--telemetry", str(telemetry), "--workspace", str(workspace),
         "--project-root", str(PROJECT_ROOT), "--profile", profile, "--publish-directory", str(profile_assets), "--use-gpu",
     ]
     log: list[str] = []
     process: subprocess.Popen[str] | None = None
     try:
+        kwargs = {}
+        if os.name == 'nt':
+            kwargs['creationflags'] = subprocess.CREATE_NEW_PROCESS_GROUP
+        else:
+            kwargs['start_new_session'] = True
+            
         process = subprocess.Popen(
-            command, cwd=PROJECT_ROOT, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, start_new_session=True
+            command, cwd=PROJECT_ROOT, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **kwargs
         )
         with RUNNER_LOCK:
             ACTIVE_PROCESS = process

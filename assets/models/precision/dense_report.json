@@ -1,0 +1,22 @@
+{
+  "status": "dense_textured_metric_model_ready",
+  "dense_point_cloud": "/home/ayush/repos/ekaDrishti-3D/data/missions/20260927-110811-7ae04c/work/dense/fused.ply",
+  "mesh": "/home/ayush/repos/ekaDrishti-3D/data/missions/20260927-110811-7ae04c/work/dense/meshed-poisson.ply",
+  "textured_mesh_directory": "/home/ayush/repos/ekaDrishti-3D/data/missions/20260927-110811-7ae04c/work/dense/textured",
+  "georeferencing": "metric_local_utm_frame",
+  "crs": "EPSG:32632",
+  "utm_origin": {
+    "latitude": 46.5168227,
+    "longitude": 6.5621113,
+    "absolute_altitude_m": 362.805
+  },
+  "metric_scale_verified": true,
+  "timings_seconds": {
+    "undistortion": 1.17,
+    "depth_maps": 843.08,
+    "fusion": 15.2,
+    "meshing": 30.31,
+    "texturing": 42.08
+  },
+  "total_seconds": 931.84
+}

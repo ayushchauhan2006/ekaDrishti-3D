@@ -13,3 +13,79 @@
 @media(max-width:840px){.viewer-shell{display:grid;grid-template-columns:1fr}.scene{min-height:66vh}.inspector{position:static;width:auto;max-height:none;border-radius:0;border-left:0;border-right:0;border-bottom:0;box-shadow:none;background:#092233;padding:26px 20px}.viewer-header{height:70px;padding:0 18px}.scene-help{left:14px;bottom:14px;border-radius:10px}}
 
 .inspector{padding:22px 24px}.inspector h1{font-size:1.46rem}.inspector .intro{margin:9px 0 16px;line-height:1.45}.inspector dl div{padding:9px 0}.actions{margin-top:16px}.tip{margin-top:14px;line-height:1.45}
+
+.scene:after {
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background-size: 100% 4px, 3px 100%;
+    z-index: 10; opacity: 0.7;
+}
+.inspector {
+    background: rgba(4, 9, 20, 0.85) !important;
+    border: 1px solid #00f3ff !important;
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.3), inset 0 0 10px rgba(0, 243, 255, 0.1) !important;
+    border-radius: 4px !important;
+    backdrop-filter: blur(10px);
+    color: #00f3ff !important;
+    font-family: "Courier New", Courier, monospace !important;
+    text-transform: uppercase;
+}
+.inspector h1 {
+    color: #fff !important;
+    text-shadow: 0 0 8px #00f3ff;
+}
+.inspector dl div {
+    border-bottom: 1px solid rgba(0,243,255,0.2) !important;
+}
+.inspector dt {
+    color: #ff00ea !important;
+    text-shadow: 0 0 5px rgba(255,0,234,0.5);
+}
+.viewer-header {
+    background: #020611 !important;
+    border-bottom: 2px solid #ff00ea !important;
+    box-shadow: 0 4px 20px rgba(255,0,234,0.2) !important;
+}
+.viewer-title strong {
+    font-family: "Courier New", Courier, monospace !important;
+    color: #00f3ff;
+    text-shadow: 0 0 8px rgba(0,243,255,0.8);
+    letter-spacing: 2px;
+}
+.actions button {
+    background: transparent !important;
+    border: 1px solid #00f3ff !important;
+    color: #00f3ff !important;
+    box-shadow: 0 0 10px rgba(0,243,255,0.2) !important;
+    text-transform: uppercase;
+    transition: 0.3s;
+}
+.actions button:hover {
+    background: #00f3ff !important;
+    color: #000 !important;
+    box-shadow: 0 0 20px rgba(0,243,255,0.8) !important;
+}
+.actions a {
+    background: transparent !important;
+    border: 1px solid #ff00ea !important;
+    color: #ff00ea !important;
+    box-shadow: 0 0 10px rgba(255,0,234,0.2) !important;
+    text-transform: uppercase;
+    transition: 0.3s;
+}
+.actions a:hover {
+    background: #ff00ea !important;
+    color: #000 !important;
+    box-shadow: 0 0 20px rgba(255,0,234,0.8) !important;
+}
+.scene-help {
+    background: rgba(0,0,0,0.8) !important;
+    border: 1px solid #ff00ea !important;
+    color: #00f3ff !important;
+    font-family: "Courier New", Courier, monospace !important;
+    box-shadow: 0 0 10px rgba(255,0,234,0.4) !important;
+}
+/* Holographic grid */
+.scene {
+    background: radial-gradient(circle at center, #020813 0%, #000 100%) !important;
+}

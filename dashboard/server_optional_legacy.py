@@ -58,7 +58,11 @@ def usable_telemetry(telemetry: Path | None) -> bool:
 
 
 def run_reconstruction(job_id: str, video: Path, telemetry: Path | None, workspace: Path) -> None:
-    python = str(PROJECT_ROOT / ".venv/bin/python") if (PROJECT_ROOT / ".venv/bin/python").is_file() else sys.executable
+    python = sys.executable
+    if os.name == 'nt' and (PROJECT_ROOT / ".venv/Scripts/python.exe").is_file():
+        python = str(PROJECT_ROOT / ".venv/Scripts/python.exe")
+    elif (PROJECT_ROOT / ".venv/bin/python").is_file():
+        python = str(PROJECT_ROOT / ".venv/bin/python")
     if usable_telemetry(telemetry):
         command = [
             python, "-u", "-m", "src.ekadrishti.full_pipeline", "--video", str(video),

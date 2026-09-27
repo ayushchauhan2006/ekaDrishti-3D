@@ -1,0 +1,25 @@
+{
+  "status": "awaiting_independent_checkpoints",
+  "claim_allowed": false,
+  "message": "Internal GPS consistency is available, but independent checkpoint or reference-dimension observations have not been supplied.",
+  "accepted_schemas": [
+    [
+      "model_x_m",
+      "model_y_m",
+      "model_z_m",
+      "name",
+      "reference_x_m",
+      "reference_y_m",
+      "reference_z_m"
+    ],
+    [
+      "model_distance_m",
+      "name",
+      "reference_distance_m"
+    ]
+  ],
+  "templates": [
+    "docs/checkpoints_template.csv",
+    "docs/reference_dimensions_template.csv"
+  ]
+}

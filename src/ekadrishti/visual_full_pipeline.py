@@ -26,7 +26,11 @@ def main() -> None:
     parser.add_argument("--project-root", type=Path, required=True)
     args = parser.parse_args()
     root, workspace, video = args.project_root.resolve(), args.workspace.resolve(), args.video.resolve()
-    python = str(root / ".venv/bin/python") if (root / ".venv/bin/python").is_file() else sys.executable
+    python = sys.executable
+    if os.name == 'nt' and (root / ".venv/Scripts/python.exe").is_file():
+        python = str(root / ".venv/Scripts/python.exe")
+    elif (root / ".venv/bin/python").is_file():
+        python = str(root / ".venv/bin/python")
     stream([
         python, "-u", "-m", "src.ekadrishti.reconstruct_visual_demo", "--video", str(video),
         "--workspace", str(workspace), "--project-root", str(root),

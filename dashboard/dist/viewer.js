@@ -72,7 +72,7 @@ function perspective(fovy, aspect, near, far) { const f = 1 / Math.tan(fovy / 2)
 function translate(x, y, z) { const m = identity(); m[12] = x; m[13] = y; m[14] = z; return m; }
 function scale(value) { const m = identity(); m[0] = m[5] = m[10] = value; return m; }
 function rotateX(angle) { const c = Math.cos(angle), s = Math.sin(angle); return new Float32Array([1, 0, 0, 0, 0, c, s, 0, 0, -s, c, 0, 0, 0, 0, 1]); }
-function rotateY(angle) { const c = Math.cos(angle), s = Math.sin(angle); return new Float32Array([c, 0, -s, 0, 0, 1, 0, 0, s, 0, c, 0, 0, 0, 0, 1]); }
+function rotateZ(angle) { const c = Math.cos(angle), s = Math.sin(angle); return new Float32Array([c, s, 0, 0, -s, c, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]); }
 
 function setupGl(data) {
   if (!gl) throw new Error('WebGL is unavailable in this browser. Open this dashboard in Chrome or Firefox.');
@@ -92,7 +92,7 @@ function render() {
   const width = Math.floor(canvas.clientWidth * pixelRatio), height = Math.floor(canvas.clientHeight * pixelRatio);
   if (canvas.width !== width || canvas.height !== height) { canvas.width = width; canvas.height = height; }
   gl.viewport(0, 0, width, height); gl.clearColor(.024, .11, .16, 1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  const model = multiply(rotateX(pitch), multiply(rotateY(yaw), multiply(scale(1 / extent), translate(-center[0], -center[1], -center[2]))));
+  const model = multiply(rotateX(pitch), multiply(rotateZ(yaw), multiply(scale(1 / extent), translate(-center[0], -center[1], -center[2]))));
   const matrix = multiply(perspective(Math.PI / 3, width / height, .01, 30), multiply(translate(0, 0, -distance), model));
   gl.useProgram(program);
   gl.uniformMatrix4fv(gl.getUniformLocation(program, 'uMatrix'), false, matrix);
